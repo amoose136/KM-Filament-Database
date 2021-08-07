@@ -1,0 +1,385 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "mysql"
+  url      = env("KM_DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
+model Filament {
+  id                     Int                   @id @default(autoincrement()) //external placeholder filament should have negative values
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @updatedAt
+  basisId                Int                   @default(0) //Gets an id if there is already data from an external sources like the prusa material table. 
+  //Used to subsitute (grayed out) data from another filament if non zero and a field like material properties or manufacturer suggested settings is missing
+  isExternalMaterial     Boolean               @default(false) // if swatch is a placeholder for external data like from the Prusa Material table and we don't have it in inventory
+  name                   String // The material name as marketed by the manufacturer eg. "Midnight Black"
+  materialClass          MaterialClass?        @default(PLA)
+  materialSubclass       String                @default("PLA") //aka the marketed material name eg. "PLA+"
+  manufacturer           Manufacturer          @relation(fields: [manufacturerId], references: [id])
+  manufacturerId         Int
+  materialProperties     MaterialProperties?
+  cost                   Float? //dollars per spool
+  weightPerSpool         Float?                @default(1.0) //in kg
+  FrontPicturePath       String? //picture of the swatch only one current picture possible
+  BacklitPicturePath     String? //Picture with the swatch back illuminated
+  gifPath                String? //rotation gif for future mouseover fancy stuff
+  linksToBuy             Link[]
+  mfgSuggestedSettings   mfgSuggestedSettings? @relation(fields: [mfgSuggestedSettingsId], references: [id])
+  mfgSuggestedSettingsId Int
+  isPublished            Boolean               @default(false) //is the filament visable on the webpage
+  comments               String?
+  addedBy                User[]
+  UsersOnFilaments       UsersOnFilaments[]
+  Solvent                Solvent?              @relation(fields: [solventId], references: [id])
+  solventId              Int?
+}
+
+model User {
+  id                           Int                            @id @unique
+  haxDBName                    String
+  filaments                    Filament[]
+  physicalProtetiesContributed PhysicalProperties[]
+  UsersOnFilaments             UsersOnFilaments[]
+  SolventsOnPhysicalProperties SolventsOnPhysicalProperties[]
+  HeatDeflectionTemperature    HeatDeflectionTemperature[]
+  CharpyImpactStrength         CharpyImpactStrength[]
+  StressStrainCurve            StressStrainCurve[]
+}
+
+//pivot table
+model UsersOnFilaments {
+  filament   Filament @relation(fields: [filamentId], references: [id])
+  filamentId Int
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int
+  assignedAt DateTime @default(now())
+
+  @@id([userId, filamentId])
+}
+
+model Link {
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  link       String
+  filament   Filament @relation(fields: [filamentId], references: [id])
+  filamentId Int
+}
+
+model Manufacturer {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  email     String?
+  address   String?
+  logoPath  String?
+  filaments Filament[]
+}
+
+// Each swatch can have physical data collected multiple times
+model MaterialProperties {
+  id                 Int                 @id @default(autoincrement())
+  isSilk             Boolean?
+  flexibilityClass   Flexible?
+  isBuoyant          Boolean? //can be autofilled out based on density
+  isComposite        Boolean?
+  isAbrasive         Boolean?
+  isExotic           Boolean? //autofilled based on glowindark or certain material classes like flex, PEEK, PEKK...really anything seldom used
+  isGlowInDark       Boolean?            @default(false)
+  isHygroscopic      Boolean? //can typically be autofilled based on material class
+  containsGlitter    Boolean?
+  physicalProperties PhysicalProperties? //seperated out so a whole table can be cleaved and replaced if need be (easier to maintain)
+  filament           Filament?           @relation(fields: [id], references: [id])
+}
+
+model Solvent {
+  id                           Int                            @id @default(autoincrement())
+  createdAt                    DateTime                       @default(now())
+  name                         String
+  materialSafetyDataSheetURL   String?
+  filaments                    Filament[]
+  SolventsOnPhysicalProperties SolventsOnPhysicalProperties[]
+  PhysicalProperties           PhysicalProperties?            @relation(fields: [physicalPropertiesId], references: [id])
+  physicalPropertiesId         Int?
+}
+
+//pivot table
+model SolventsOnPhysicalProperties {
+  solvent              Solvent            @relation(fields: [solventId], references: [id])
+  solventId            Int
+  physicalProperties   PhysicalProperties @relation(fields: [physicalPropertiesId], references: [id])
+  physicalPropertiesId Int
+  assignedBy           User               @relation(fields: [userId], references: [id])
+  userId               Int
+  assignedAt           DateTime           @default(now())
+
+  @@id([solventId, physicalPropertiesId])
+}
+
+//Intended to be averaged
+model PhysicalProperties {
+  id                Int      @id @default(autoincrement())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  dataContributedBy User[]
+
+  solubilityList    Solvent[]
+  solubilityComment String?
+
+  charpyImpactStrength                     CharpyImpactStrength[]
+  isImpactStrengthAutoFilled               Boolean                @default(false) //true if autofilled based on material selection, becomes false as soon as you change a single value
+  charpyImpactStrengthXYMean               Float? //average of samples printed in XY
+  charpyImpactStrengthXYUncertainty        Float? //error bars for impact strength of samples printed in XY orientation
+  charpyImpactStrengthZMean                Float? //average of samples printed in Z
+  charpyImpactStrengthZUncertainty         Float? //error bars for impact strength of samples printed in Z orientation
+  charpyImpactStrengthIsotropicMean        Float? //average of XY and Z direction strengths
+  charpyImpactStrengthIsotropicUncertainty Float? //error bars for isotropic impact strength properly propagated from XY and Z errors
+
+  shoreHardness        Float? //I (amoose136) estimate that the uncertainty here is probably low enough to be not worth recording so the database only accepts a single point
+  isHardnessAutoFilled Boolean @default(false) //true if autofilled based on material selection, becomes false as soon as you change a single value
+  shoreScale           String? @default("A") //could also be D scale which requires some conversion to compare
+
+  heatDeflectionTemperature             HeatDeflectionTemperature[]
+  isHeatDeflectionTemperatureAutoFilled Boolean                     @default(false) //true if autofilled based on material selection, becomes false as soon as you enter a value
+  heatDeflectionTemperatureUncertainty  Float? //Derived from above
+
+  density             Float? //Auto computed by weighing the swatches (magnets included) which have a known volume of filament in them. Expected low deviation sp single value.
+  isDensityAutoFilled Boolean @default(false) //true if autofilled based on material selection, becomes false as soon as you enter a value 
+  densityUnits        String? @default("kg/m^3")
+
+  opticalDensity                         Float? //Unitless with measurement method TBD
+  isODAutoFilled                         Boolean             @default(false) //true if autofilled based on material selection, becomes false as soon as you enter a value 
+  sheenLevel                             Sheen? //subjective level with dubious value
+  PantoneApproximation                   String? //Initially derived from the image but later converted from measured XYZ value
+  RGBApproximation                       RGBApproximation? //Initially derived from the image but later converted from measured XYZ value
+  XYZColor                               AbsoluteColor[] //absolute color space. Later to be used for the distance metric. Must be measured with an absolute color space sensor.
+  //-----------------------------------------------------------------------------------------------
+  //All the following quantities can be derived from the stress strain curves as they are submitted
+  //-----------------------------------------------------------------------------------------------
+  stressStrainCurve                      StressStrainCurve[]
+  isSSAutoFilled                         Boolean             @default(false) //true if autofilled based on material selection, becomes false as soon as you enter a value 
+  ultimateTensileStrengthSkewMean        Float? //average of UTS data points for models printed in skew orientation
+  ultimateTensileStrengthSkewUncertainty Float? // UTS error for models printed in skew orientation
+  ultimateTensileStrengthZMean           Float? //average of UTS data points for models printed in Z orientation
+  ultimateTensileStrengthZUncertainty    Float? // UTS error for models printed in Z orientation
+  ultimateTensileStrengthXYMean          Float? //average of UTS for models printed in XY orientation
+  ultimateTensileStrengthXYUncertainty   Float? //UTS error for models printed in XY orientation
+
+  //Display these two
+  ultimateTensileStrengthIsotropicMean        Float? //Equal weight average of the ultimate tensile strengths from XY and Z
+  ultimateTensileStrengthIsotropicUncertainty Float? //Error bars for direction invariant UTS that propagates from the XY and Z errors
+
+  yieldStrengthSkewMean        Float? //average of YS data points for models printed in skew orientation
+  yieldStrengthSkewUncertainty Float? //error bars of YS mean for models printed in skew orientation
+  yieldStrengthZMean           Float? //average of YS data points for models printed in Z orientation
+  yieldStrengthZUncertainty    Float? //error bars of YS mean for models printed in Z orientation
+  yieldStrengthXY              Float? //average of YS data points for models printed in XY orientation
+  yieldStrengthXYUncertainty   Float? //error bars of YS mean for models printed in XY orientation
+
+  //Display these two
+  yieldStrengthIsotropicMean        Float? //Equal weight average of the yield strengths from XY and Z
+  yieldStrengthIsotropicUncertainty Float? //error bars for direction invariant yield strength
+
+  elongationAtBreakSkewMean        Float? // % stretch before breaking when model printed in skew orientation
+  elongationAtBreakSkewUncertainty Float? //error bars for model printed in skew direction
+  elongationAtBreakZMean           Float? // % stretch before breaking when model printed in Z orientation
+  elongationAtBreakZUncertainty    Float? //error bars for model printed in Z direction
+  elongationAtBreakXYMean          Float? // % stretch before breaking when printed in XY orientatio
+  elongationAtBreakXYUncertainty   Float? //error bars for XY direction
+
+  //Display these two
+  elongationAtBreakIsotropicMean        Float? //direction invariant % stretch before breaking
+  elongationAtBreakIsotropicUncertainty Float? //error bars for averaged data
+
+  modulusOfElasticitySkewMean        Float? // % stretch before breaking when model printed in skew orientation
+  modulusOfElasticitySkewUncertainty Float? //error bars for model printed in skew direction
+  modulusOfElasticityZMean           Float? // % stretch before breaking when model printed in Z orientation
+  modulusOfElasticityZUncertainty    Float? //error bars for model printed in Z direction
+  modulusOfElasticityXYMean          Float? // % stretch before breaking when printed in XY orientatio
+  modulusOfElasticityXYUncertainty   Float? //error bars for XY direction
+
+  //Display these two
+  modulusOfElasticityIsotropicMean        Float? //direction invariant % stretch before breaking
+  modulusOfElasticityIsotropicUncertainty Float? //error bars for averaged data
+
+  //Future possibly S-N curves but that's a difficult thing to get data on even for commercial grade materials
+  // so it's probably outside the realm of what KM can reasonably ever do. That said, creep/fatigue is a real
+  // problem with plastics so it sure would be nice if that was available from somewhere.
+  materialProperties           MaterialProperties             @relation(fields: [materialPropertiesId], references: [id])
+  materialPropertiesId         Int
+  SolventsOnPhysicalProperties SolventsOnPhysicalProperties[]
+}
+
+model HeatDeflectionTemperature {
+  id            Int      @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+  createdBy     User     @relation(fields: [creatorUserId], references: [id])
+  creatorUserId Int
+
+  temp                     Float
+  filamentBatch            String?
+  units                    String              @default("C")
+  specimenPrintOrientation PrintOrientation
+  specimenType             BendSpecimenType
+  physicalproperties       PhysicalProperties? @relation(fields: [physicalPropertiesId], references: [id])
+  physicalPropertiesId     Int
+}
+
+model CharpyImpactStrength {
+  id            Int      @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+  createdBy     User     @relation(fields: [creatorUserId], references: [id])
+  creatorUserId Int
+
+  impactStrength           Float
+  units                    String              @default("J/m^2")
+  filamentBatch            String?
+  specimenPrintOrientation PrintOrientation
+  specimenType             ImpactSpecimenType
+  physicalproperties       PhysicalProperties? @relation(fields: [physicalPropertiesId], references: [id])
+  physicalPropertiesId     Int
+}
+
+model StressStrainCurve {
+  id            Int      @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+  createdBy     User     @relation(fields: [creatorUserId], references: [id])
+  creatorUserId Int
+
+  filamentBatch            String?
+  specimenPrintOrientation PrintOrientation
+  specimenType             TensileSpecimenType
+  units                    String              @default("MPa") //strictly speaking one axis is in MPa and the other is unitless
+  stressStrainPoints       StressStrainPoint[] //Stress is in MPa
+  physicalproperties       PhysicalProperties? @relation(fields: [physicalPropertiesId], references: [id])
+  physicalPropertiesId     Int
+}
+
+model StressStrainPoint {
+  id                  Int                @id @default(autoincrement())
+  stress              Float //MPa
+  strain              Float //unitless (% of total length)
+  stressStrainCurve   StressStrainCurve? @relation(fields: [stressStrainCurveId], references: [id])
+  stressStrainCurveId Int?
+}
+
+model mfgSuggestedSettings {
+  id           Int      @id @default(autoincrement())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  isAutoFilled Boolean  @default(true) //true if autofilled based on material selection, becomes false as soon as you change a single value
+
+  //If only a target temp the values will be set to the same value. Below 40 is off.
+  bedTempIdeal Float? //Celsius
+  bedTempMin   Float? //Celsius
+  bedTempMax   Float? //Celsius
+
+  hotendTempIdeal Float? //Celsius
+  hotendTempMin   Float? //Celsius
+  hotendTempMax   Float? //Celsius
+
+  CoolingNeeded         Boolean?   @default(true) //Do you use the cooling fans with this filament
+  enclosureNeeded       Boolean    @default(false) // For things like ABS and Nylon
+  enclosureHeaterNeeded Boolean    @default(false) // For things like PEEK
+  enclosureTempMin      Float? //Celsius 
+  enclosureTempMax      Float? //Celsius
+  maxPrintSpeed         Int? //mm/s, probably not too meaningful
+  comments              String? // Comments about printing
+  Filament              Filament[]
+}
+
+model AbsoluteColor {
+  id                   Int                 @id @default(autoincrement())
+  createdAt            DateTime            @default(now())
+  x                    Float
+  y                    Float
+  z                    Float
+  physicalProperties   PhysicalProperties? @relation(fields: [physicalPropertiesId], references: [id])
+  physicalPropertiesId Int
+}
+
+model RGBApproximation {
+  id                   Int                 @id @default(autoincrement())
+  createdAt            DateTime            @default(now())
+  R                    Int //0-255
+  G                    Int //0-255
+  B                    Int //0-255
+  physicalProperties   PhysicalProperties? @relation(fields: [physicalPropertiesId], references: [id])
+  physicalPropertiesId Int
+}
+
+enum Flexible {
+  SEMIFLEX
+  FLEX
+  RIGID
+}
+
+enum PrintOrientation {
+  XY
+  Z
+  SKEW //For something like a creality CR-30 belt printer that prints at 45 degrees 
+  UNKNOWN //For external data placeholder
+}
+
+enum BendSpecimenType {
+  ASTM_D648
+  ISO_75
+  UNKNOWN //For external data placeholder
+}
+
+enum ImpactSpecimenType {
+  ISO_13802
+  ASTM_D6110
+  ISO_179
+  UNKNOWN //For external data placeholder
+}
+
+enum TensileSpecimenType {
+  ASTM_D638_Type1
+  ASTM_D638_Type2
+  ASTM_D638_Type3
+  ASTM_D638_Type4
+  ASTM_D638_Type5
+  ISO_527_2_1A
+  ISO_527_1BA //what CNC Kictchen Uses
+  UNKNOWN //For external data placeholder
+}
+
+enum MaterialClass {
+  ABS
+  PMMA //ACRYLIC
+  ASA
+  BVOH
+  PLA
+  PE
+  PETG
+  PC
+  PCTG
+  PA //aka nylon
+  PP
+  PVA
+  HIPS
+  TPU
+  TPE
+  PEEK
+  PEKK
+  PEI
+  PURGE
+  CPE
+  BLEND
+  RESIN
+}
+
+enum Sheen {
+  low
+  medium
+  high
+}

@@ -1,0 +1,393 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table Filament {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  basisId Int [not null, default: 0]
+  isExternalMaterial Boolean [not null, default: false]
+  name String [not null]
+  materialClass MaterialClass [default: 'PLA']
+  materialSubclass String [not null, default: 'PLA']
+  manufacturer Manufacturer [not null]
+  manufacturerId Int [not null]
+  materialProperties MaterialProperties
+  cost Float
+  weightPerSpool Float [default: 1]
+  FrontPicturePath String
+  BacklitPicturePath String
+  gifPath String
+  linksToBuy Link [not null]
+  mfgSuggestedSettings mfgSuggestedSettings
+  mfgSuggestedSettingsId Int [not null]
+  isPublished Boolean [not null, default: false]
+  comments String
+  addedBy User [not null]
+  UsersOnFilaments UsersOnFilaments [not null]
+  Solvent Solvent
+  solventId Int
+}
+
+Table User {
+  id Int [pk, unique]
+  haxDBName String [not null]
+  filaments Filament [not null]
+  physicalProtetiesContributed PhysicalProperties [not null]
+  UsersOnFilaments UsersOnFilaments [not null]
+  SolventsOnPhysicalProperties SolventsOnPhysicalProperties [not null]
+  HeatDeflectionTemperature HeatDeflectionTemperature [not null]
+  CharpyImpactStrength CharpyImpactStrength [not null]
+  StressStrainCurve StressStrainCurve [not null]
+}
+
+Table UsersOnFilaments {
+  filament Filament [not null]
+  filamentId Int [not null]
+  user User [not null]
+  userId Int [not null]
+  assignedAt DateTime [default: `now()`, not null]
+
+  indexes {
+    (userId, filamentId) [pk]
+  }
+}
+
+Table Link {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  link String [not null]
+  filament Filament [not null]
+  filamentId Int [not null]
+}
+
+Table Manufacturer {
+  id Int [pk, increment]
+  name String [unique, not null]
+  email String
+  address String
+  logoPath String
+  filaments Filament [not null]
+}
+
+Table MaterialProperties {
+  id Int [pk, increment]
+  isSilk Boolean
+  flexibilityClass Flexible
+  isBuoyant Boolean
+  isComposite Boolean
+  isAbrasive Boolean
+  isExotic Boolean
+  isGlowInDark Boolean [default: false]
+  isHygroscopic Boolean
+  containsGlitter Boolean
+  physicalProperties PhysicalProperties
+  filament Filament
+}
+
+Table Solvent {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  name String [not null]
+  materialSafetyDataSheetURL String
+  filaments Filament [not null]
+  SolventsOnPhysicalProperties SolventsOnPhysicalProperties [not null]
+  PhysicalProperties PhysicalProperties
+  physicalPropertiesId Int
+}
+
+Table SolventsOnPhysicalProperties {
+  solvent Solvent [not null]
+  solventId Int [not null]
+  physicalProperties PhysicalProperties [not null]
+  physicalPropertiesId Int [not null]
+  assignedBy User [not null]
+  userId Int [not null]
+  assignedAt DateTime [default: `now()`, not null]
+
+  indexes {
+    (solventId, physicalPropertiesId) [pk]
+  }
+}
+
+Table PhysicalProperties {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  dataContributedBy User [not null]
+  solubilityList Solvent [not null]
+  solubilityComment String
+  charpyImpactStrength CharpyImpactStrength [not null]
+  isImpactStrengthAutoFilled Boolean [not null, default: false]
+  charpyImpactStrengthXYMean Float
+  charpyImpactStrengthXYUncertainty Float
+  charpyImpactStrengthZMean Float
+  charpyImpactStrengthZUncertainty Float
+  charpyImpactStrengthIsotropicMean Float
+  charpyImpactStrengthIsotropicUncertainty Float
+  shoreHardness Float
+  isHardnessAutoFilled Boolean [not null, default: false]
+  shoreScale String [default: 'A']
+  heatDeflectionTemperature HeatDeflectionTemperature [not null]
+  isHeatDeflectionTemperatureAutoFilled Boolean [not null, default: false]
+  heatDeflectionTemperatureUncertainty Float
+  density Float
+  isDensityAutoFilled Boolean [not null, default: false]
+  densityUnits String [default: 'kg/m^3']
+  opticalDensity Float
+  isODAutoFilled Boolean [not null, default: false]
+  sheenLevel Sheen
+  PantoneApproximation String
+  RGBApproximation RGBApproximation
+  XYZColor AbsoluteColor [not null]
+  stressStrainCurve StressStrainCurve [not null]
+  isSSAutoFilled Boolean [not null, default: false]
+  ultimateTensileStrengthSkewMean Float
+  ultimateTensileStrengthSkewUncertainty Float
+  ultimateTensileStrengthZMean Float
+  ultimateTensileStrengthZUncertainty Float
+  ultimateTensileStrengthXYMean Float
+  ultimateTensileStrengthXYUncertainty Float
+  ultimateTensileStrengthIsotropicMean Float
+  ultimateTensileStrengthIsotropicUncertainty Float
+  yieldStrengthSkewMean Float
+  yieldStrengthSkewUncertainty Float
+  yieldStrengthZMean Float
+  yieldStrengthZUncertainty Float
+  yieldStrengthXY Float
+  yieldStrengthXYUncertainty Float
+  yieldStrengthIsotropicMean Float
+  yieldStrengthIsotropicUncertainty Float
+  elongationAtBreakSkewMean Float
+  elongationAtBreakSkewUncertainty Float
+  elongationAtBreakZMean Float
+  elongationAtBreakZUncertainty Float
+  elongationAtBreakXYMean Float
+  elongationAtBreakXYUncertainty Float
+  elongationAtBreakIsotropicMean Float
+  elongationAtBreakIsotropicUncertainty Float
+  modulusOfElasticitySkewMean Float
+  modulusOfElasticitySkewUncertainty Float
+  modulusOfElasticityZMean Float
+  modulusOfElasticityZUncertainty Float
+  modulusOfElasticityXYMean Float
+  modulusOfElasticityXYUncertainty Float
+  modulusOfElasticityIsotropicMean Float
+  modulusOfElasticityIsotropicUncertainty Float
+  materialProperties MaterialProperties [not null]
+  materialPropertiesId Int [not null]
+  SolventsOnPhysicalProperties SolventsOnPhysicalProperties [not null]
+}
+
+Table HeatDeflectionTemperature {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  createdBy User [not null]
+  creatorUserId Int [not null]
+  temp Float [not null]
+  filamentBatch String
+  units String [not null, default: 'C']
+  specimenPrintOrientation PrintOrientation [not null]
+  specimenType BendSpecimenType [not null]
+  physicalproperties PhysicalProperties
+  physicalPropertiesId Int [not null]
+}
+
+Table CharpyImpactStrength {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  createdBy User [not null]
+  creatorUserId Int [not null]
+  impactStrength Float [not null]
+  units String [not null, default: 'J/m^2']
+  filamentBatch String
+  specimenPrintOrientation PrintOrientation [not null]
+  specimenType ImpactSpecimenType [not null]
+  physicalproperties PhysicalProperties
+  physicalPropertiesId Int [not null]
+}
+
+Table StressStrainCurve {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  createdBy User [not null]
+  creatorUserId Int [not null]
+  filamentBatch String
+  specimenPrintOrientation PrintOrientation [not null]
+  specimenType TensileSpecimenType [not null]
+  units String [not null, default: 'MPa']
+  stressStrainPoints StressStrainPoint [not null]
+  physicalproperties PhysicalProperties
+  physicalPropertiesId Int [not null]
+}
+
+Table StressStrainPoint {
+  id Int [pk, increment]
+  stress Float [not null]
+  strain Float [not null]
+  stressStrainCurve StressStrainCurve
+  stressStrainCurveId Int
+}
+
+Table mfgSuggestedSettings {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  isAutoFilled Boolean [not null, default: true]
+  bedTempIdeal Float
+  bedTempMin Float
+  bedTempMax Float
+  hotendTempIdeal Float
+  hotendTempMin Float
+  hotendTempMax Float
+  CoolingNeeded Boolean [default: true]
+  enclosureNeeded Boolean [not null, default: false]
+  enclosureHeaterNeeded Boolean [not null, default: false]
+  enclosureTempMin Float
+  enclosureTempMax Float
+  maxPrintSpeed Int
+  comments String
+  Filament Filament [not null]
+}
+
+Table AbsoluteColor {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  x Float [not null]
+  y Float [not null]
+  z Float [not null]
+  physicalProperties PhysicalProperties
+  physicalPropertiesId Int [not null]
+}
+
+Table RGBApproximation {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  R Int [not null]
+  G Int [not null]
+  B Int [not null]
+  physicalProperties PhysicalProperties
+  physicalPropertiesId Int [not null]
+}
+
+Table FilamentToUser {
+  addedbyId Int [ref: > User.id]
+  filamentsId Int [ref: > Filament.id]
+}
+
+Table PhysicalPropertiesToUser {
+  physicalprotetiescontributedId Int [ref: > PhysicalProperties.id]
+  datacontributedbyId Int [ref: > User.id]
+}
+
+Enum Flexible {
+  SEMIFLEX
+  FLEX
+  RIGID
+}
+
+Enum PrintOrientation {
+  XY
+  Z
+  SKEW
+  UNKNOWN
+}
+
+Enum BendSpecimenType {
+  ASTM_D648
+  ISO_75
+  UNKNOWN
+}
+
+Enum ImpactSpecimenType {
+  ISO_13802
+  ASTM_D6110
+  ISO_179
+  UNKNOWN
+}
+
+Enum TensileSpecimenType {
+  ASTM_D638_Type1
+  ASTM_D638_Type2
+  ASTM_D638_Type3
+  ASTM_D638_Type4
+  ASTM_D638_Type5
+  ISO_527_2_1A
+  ISO_527_1BA
+  UNKNOWN
+}
+
+Enum MaterialClass {
+  ABS
+  PMMA
+  ASA
+  BVOH
+  PLA
+  PE
+  PETG
+  PC
+  PCTG
+  PA
+  PP
+  PVA
+  HIPS
+  TPU
+  TPE
+  PEEK
+  PEKK
+  PEI
+  PURGE
+  CPE
+  BLEND
+  RESIN
+}
+
+Enum Sheen {
+  low
+  medium
+  high
+}
+
+Ref: Filament.manufacturerId > Manufacturer.id
+
+Ref: Filament.mfgSuggestedSettingsId > mfgSuggestedSettings.id
+
+Ref: Filament.solventId > Solvent.id
+
+Ref: UsersOnFilaments.filamentId > Filament.id
+
+Ref: UsersOnFilaments.userId > User.id
+
+Ref: Link.filamentId > Filament.id
+
+Ref: MaterialProperties.id - Filament.id
+
+Ref: Solvent.physicalPropertiesId > PhysicalProperties.id
+
+Ref: SolventsOnPhysicalProperties.solventId > Solvent.id
+
+Ref: SolventsOnPhysicalProperties.physicalPropertiesId > PhysicalProperties.id
+
+Ref: SolventsOnPhysicalProperties.userId > User.id
+
+Ref: PhysicalProperties.materialPropertiesId - MaterialProperties.id
+
+Ref: HeatDeflectionTemperature.creatorUserId > User.id
+
+Ref: HeatDeflectionTemperature.physicalPropertiesId > PhysicalProperties.id
+
+Ref: CharpyImpactStrength.creatorUserId > User.id
+
+Ref: CharpyImpactStrength.physicalPropertiesId > PhysicalProperties.id
+
+Ref: StressStrainCurve.creatorUserId > User.id
+
+Ref: StressStrainCurve.physicalPropertiesId > PhysicalProperties.id
+
+Ref: StressStrainPoint.stressStrainCurveId > StressStrainCurve.id
+
+Ref: AbsoluteColor.physicalPropertiesId > PhysicalProperties.id
+
+Ref: RGBApproximation.physicalPropertiesId - PhysicalProperties.id
