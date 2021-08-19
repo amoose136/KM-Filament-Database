@@ -1,6 +1,6 @@
 <template>
   <div class="box-border md:box-content align-center">
-    <h1>Url currently has this number at end: {{ this.filamentId }}</h1>
+    <h1>Url currently has this number at end: {{ filamentId }}</h1>
     <br />
     <nuxt-link
       class="
@@ -21,18 +21,18 @@
         shadow
       "
       type="button"
-      :to="this.next"
+      :to="next"
       >Next page</nuxt-link
     >
   </div>
 </template>
 
-<script>
+<script lang='ts'>
+import type { Context } from '@nuxt/types/app/index'
 export default {
-  async asyncData({ params }) {
-    const sId = params.filamentId // When calling /abc the filamentId will be "abc"
-    const filamentId = String(Number(sId))
-    const next = String(Number(sId) + 1)
+  async asyncData({ params }: Context) {
+    const filamentId: String = params.filamentId
+    const next: String = String(Number(filamentId) + 1)
     return { filamentId, next }
   },
 }

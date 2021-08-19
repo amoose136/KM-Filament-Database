@@ -1,13 +1,14 @@
+
 <template>
   <div>Hello World</div>
 </template>
 
-<script>
+<script lang='ts'>
 export default {}
 </script>
 
 <style scoped>
 div {
-    background: red;
+  background: red;
 }
 </style>

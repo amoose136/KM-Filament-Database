@@ -12,7 +12,7 @@ import { setContext, getLocation, getRouteData, normalizeError } from './utils'
 
 /* Plugins */
 
-import nuxt_plugin_plugin_17829632 from 'nuxt_plugin_plugin_17829632' // Source: .\\components\\plugin.js (mode: 'all')
+import nuxt_plugin_plugin_2f6a433e from 'nuxt_plugin_plugin_2f6a433e' // Source: .\\components\\plugin.js (mode: 'all')
 
 // Component: <ClientOnly>
 Vue.component(ClientOnly.name, ClientOnly)
@@ -176,8 +176,8 @@ async function createApp(ssrContext, config = {}) {
   }
   // Plugin execution
 
-  if (typeof nuxt_plugin_plugin_17829632 === 'function') {
-    await nuxt_plugin_plugin_17829632(app.context, inject)
+  if (typeof nuxt_plugin_plugin_2f6a433e === 'function') {
+    await nuxt_plugin_plugin_2f6a433e(app.context, inject)
   }
 
   // Lock enablePreview in context
@@ -189,12 +189,14 @@ async function createApp(ssrContext, config = {}) {
 
   // Wait for async component to be resolved first
   await new Promise((resolve, reject) => {
-    const { route } = router.resolve(app.context.route.fullPath)
-    // Ignore 404s rather than blindly replacing URL
-    if (!route.matched.length && process.client) {
-      return resolve()
+    // Ignore 404s rather than blindly replacing URL in browser
+    if (process.client) {
+      const { route } = router.resolve(app.context.route.fullPath)
+      if (!route.matched.length) {
+        return resolve()
+      }
     }
-    router.replace(route, resolve, (err) => {
+    router.replace(app.context.route.fullPath, resolve, (err) => {
       // https://github.com/vuejs/vue-router/blob/v3.4.3/src/util/errors.js
       if (!err._isRouter) return reject(err)
       if (err.type !== 2 /* NavigationFailureType.redirected */) return resolve()
