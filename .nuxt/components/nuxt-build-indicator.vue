@@ -117,7 +117,7 @@ export default {
   font-family: monospace;
   padding: 5px 10px;
   border-radius: 5px;
-  box-shadow: 1px 1px 2px 0 rgba(0,0,0,0.2);
+  box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.2);
   width: 88px;
   z-index: 2147483647;
   font-size: 16px;

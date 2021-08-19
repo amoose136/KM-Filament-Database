@@ -1,3 +1,4 @@
+
 module.exports = {
   root: true,
   env: {
@@ -6,7 +7,7 @@ module.exports = {
   },
   parserOptions: {
     parser: '@babel/eslint-parser',
-    requireConfigFile: false
+    requireConfigFile: false,
   },
   extends: [
     '@nuxtjs',
@@ -15,6 +16,17 @@ module.exports = {
   ],
   plugins: [
   ],
+
+
   // add your custom rules here
-  rules: {}
+  rules: {
+    'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
+    "no-mixed-spaces-and-tabs": [0],
+    "no-tabs": 0,
+    "skipBlankLines": 0,
+    "ignoreComments": 0,
+    "no-trailing-spaces": [2, { "skipBlankLines": true }]
+  }
 }
+
+

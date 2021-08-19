@@ -156,9 +156,9 @@ export default {
 <style>
 .nuxt-progress {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0px;
+  left: 0px;
+  right: 0px;
   height: 2px;
   width: 0%;
   opacity: 1;
