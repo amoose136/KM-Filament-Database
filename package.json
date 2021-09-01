@@ -36,7 +36,7 @@
     "jest": "^27.0.5",
     "postcss": "^8.3.5",
     "prettier": "^2.3.2",
-    "prisma": "^2.29.1",
+    "prisma": "^2.30.2",
     "prisma-dbml-generator": "^0.7.0",
     "stylelint": "^13.13.1",
     "stylelint-config-prettier": "^8.0.2",
