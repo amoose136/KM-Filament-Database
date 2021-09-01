@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@trpc/client": "^8.4.2",
-    "@trpc/server": "^8.4.2",
+    "@trpc/server": "^9.0.1",
     "chokidar": "^3.5.2",
     "core-js": "^3.15.1",
     "nuxt": "^2.15.8",
