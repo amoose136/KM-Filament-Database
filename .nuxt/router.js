@@ -4,9 +4,9 @@ import { normalizeURL, decode } from 'ufo'
 import { interopDefault } from './utils'
 import scrollBehavior from './router.scrollBehavior.js'
 
-const _fd9bfd80 = () => interopDefault(import('..\\pages\\f\\index.vue' /* webpackChunkName: "pages/f/index" */))
-const _69e0911e = () => interopDefault(import('..\\pages\\f\\_filamentId.vue' /* webpackChunkName: "pages/f/_filamentId" */))
-const _59f4fd6e = () => interopDefault(import('..\\pages\\index.vue' /* webpackChunkName: "pages/index" */))
+const _387fce25 = () => interopDefault(import('..\\pages\\f\\index.vue' /* webpackChunkName: "pages/f/index" */))
+const _7c985e43 = () => interopDefault(import('..\\pages\\f\\_filamentId.vue' /* webpackChunkName: "pages/f/_filamentId" */))
+const _1dc83aae = () => interopDefault(import('..\\pages\\index.vue' /* webpackChunkName: "pages/index" */))
 
 const emptyFn = () => {}
 
@@ -21,15 +21,15 @@ export const routerOptions = {
 
   routes: [{
     path: "/f",
-    component: _fd9bfd80,
+    component: _387fce25,
     name: "f"
   }, {
     path: "/f/:filamentId",
-    component: _69e0911e,
+    component: _7c985e43,
     name: "f-filamentId"
   }, {
     path: "/",
-    component: _59f4fd6e,
+    component: _1dc83aae,
     name: "index"
   }],
 

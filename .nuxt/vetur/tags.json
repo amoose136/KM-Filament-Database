@@ -1,4 +1,7 @@
 {
+  "FilamentImagePlaceholder": {
+    "description": "Auto imported from components/FilamentImagePlaceholder.vue"
+  },
   "SmallHexTile": {
     "description": "Auto imported from components/SmallHexTile.vue"
   }

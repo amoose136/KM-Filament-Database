@@ -2,22 +2,19 @@
   {
     "name": "f",
     "path": "/f",
-    "component": "C:\\\\Users\\\\amoos\\\\Code\\\\KM_Filament_Database_new\\\\KM_Filament_Database\\\\pages\\\\f\\\\index.vue",
-    "chunkName": "pages/f/index",
-    "_name": "_fd9bfd80"
+    "component": "C:\\\\Users\\\\amoos\\\\Code\\\\KM_FILAMENT_DB\\\\pages\\\\f\\\\index.vue",
+    "chunkName": "pages/f/index"
   },
   {
     "name": "f-filamentId",
     "path": "/f/:filamentId",
-    "component": "C:\\\\Users\\\\amoos\\\\Code\\\\KM_Filament_Database_new\\\\KM_Filament_Database\\\\pages\\\\f\\\\_filamentId.vue",
-    "chunkName": "pages/f/_filamentId",
-    "_name": "_69e0911e"
+    "component": "C:\\\\Users\\\\amoos\\\\Code\\\\KM_FILAMENT_DB\\\\pages\\\\f\\\\_filamentId.vue",
+    "chunkName": "pages/f/_filamentId"
   },
   {
     "name": "index",
     "path": "/",
-    "component": "C:\\\\Users\\\\amoos\\\\Code\\\\KM_Filament_Database_new\\\\KM_Filament_Database\\\\pages\\\\index.vue",
-    "chunkName": "pages/index",
-    "_name": "_59f4fd6e"
+    "component": "C:\\\\Users\\\\amoos\\\\Code\\\\KM_FILAMENT_DB\\\\pages\\\\index.vue",
+    "chunkName": "pages/index"
   }
 ]
