@@ -48,5 +48,9 @@
   },
   "resolutions": {
     "glob-parent": "^6.0.1"
+  },
+  "optionalDependencies": {
+    "chokidar": "^3.5.2",
+    "fsevents": "^2.3.2"
   }
 }
