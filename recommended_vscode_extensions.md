@@ -1,4 +1,4 @@
-#Recommended VSCode Extensions
+# Recommended VSCode Extensions
 For working with this project in vscode I recommend installing:
 * Eslint
 * Prettier
