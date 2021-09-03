@@ -17,7 +17,7 @@
         "@prisma/client": "^2.30.2",
         "core-js": "^3.17.1",
         "nuxt": "^2.15.7",
-        "semver": "^6.3.0",
+        "semver": "^7.3.5",
         "tar": "^6.1.11"
     },
     "devDependencies": {
