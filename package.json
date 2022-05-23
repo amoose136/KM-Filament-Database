@@ -15,7 +15,7 @@
     },
     "dependencies": {
         "@prisma/client": "^2.30.3",
-        "core-js": "^3.17.2",
+        "core-js": "^3.22.6",
         "nuxt": "^2.15.7",
         "semver": "^7.3.5",
         "tar": "^6.1.11"
